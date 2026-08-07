@@ -27,6 +27,9 @@ body {
   margin: 0 auto;
 }
 
+
+/* HEADER */
+
 h1 {
   text-align: center;
   color: #0d3b66;
@@ -36,9 +39,42 @@ h1 {
 .subtitle {
   text-align: center;
   color: #64748b;
-  margin: 0 0 24px;
+  margin: 0 0 18px;
   font-size: 15px;
 }
+
+
+/* REFERENCE BUTTONS */
+
+.reference-links {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-bottom: 22px;
+}
+
+.reference-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 9px 14px;
+  background: #ffffff;
+  color: #0d3b66;
+  border: 1px solid #cbd5e1;
+  border-radius: 8px;
+  text-decoration: none;
+  font-weight: 700;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+.reference-button:hover {
+  background: #eef3f8;
+}
+
+
+/* SEARCH */
 
 .search-box {
   margin-bottom: 18px;
@@ -59,24 +95,34 @@ h1 {
   box-shadow: 0 0 0 2px rgba(13,59,102,.08);
 }
 
+
+/* RESULTS */
+
 .results {
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 14px;
 }
 
+
+/* RESULT CARD */
+
 .card {
-  background: #fff;
-  padding: 16px 19px;
+  background: #ffffff;
   border-radius: 10px;
+  padding: 0;
+  overflow: hidden;
   box-shadow: 0 2px 7px rgba(0,0,0,.06);
   border-left: 5px solid #0d3b66;
 }
 
+
+/* ITEM / SEARCH RESULT */
+
 .card-title {
-  padding-bottom: 12px;
-  margin-bottom: 12px;
-  border-bottom: 1px solid #e2e8f0;
+  padding: 15px 18px 13px;
+  background: #ffffff;
+  border-bottom: 1px solid #dfe5ec;
 }
 
 .card-title h3 {
@@ -86,10 +132,32 @@ h1 {
   line-height: 1.35;
 }
 
+
+/* CODING AREA */
+
+.coding-details {
+  padding: 14px 18px 16px;
+  background: #fafbfd;
+}
+
+.gl-account {
+  font-size: 15px;
+  margin-bottom: 12px;
+}
+
+.gl-account .value {
+  font-weight: 700;
+  color: #1f2937;
+}
+
 .details-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 8px 24px;
+  gap: 9px 28px;
+}
+
+.detail-row {
+  line-height: 1.45;
 }
 
 .full {
@@ -98,18 +166,21 @@ h1 {
 
 .label {
   font-weight: 700;
+  color: #374151;
 }
 
-.gl-account {
-  font-size: 15px;
-}
+
+/* MEMO */
 
 .memo {
-  margin-top: 10px;
+  margin-top: 12px;
+  padding: 9px 11px;
   background: #eef3f8;
-  padding: 8px 10px;
   border-radius: 6px;
 }
+
+
+/* NOTE */
 
 .note {
   margin-top: 12px;
@@ -120,6 +191,9 @@ h1 {
   font-weight: 600;
 }
 
+
+/* NO RESULTS */
+
 .empty {
   background: white;
   padding: 22px;
@@ -127,6 +201,9 @@ h1 {
   border-radius: 10px;
   color: #64748b;
 }
+
+
+/* MOBILE */
 
 @media (max-width: 700px) {
 
@@ -148,15 +225,46 @@ h1 {
 
 </head>
 
+
 <body>
 
 <div class="container">
+
 
   <h1>Expense Coding Tool</h1>
 
   <p class="subtitle">
     Search by item, keyword, GL account, department, or entity.
   </p>
+
+
+  <div class="reference-links">
+
+    <!--
+      We will connect these to the actual separate
+      GitHub Pages URLs in the next step.
+    -->
+
+    <a
+      class="reference-button"
+      id="codingReferenceLink"
+      href="#"
+      onclick="referenceNotConnected(event)"
+    >
+      📘 Coding Reference
+    </a>
+
+    <a
+      class="reference-button"
+      id="entityGuideLink"
+      href="#"
+      onclick="referenceNotConnected(event)"
+    >
+      🏢 Entity Guide
+    </a>
+
+  </div>
+
 
   <div class="search-box">
 
@@ -170,35 +278,36 @@ h1 {
 
   </div>
 
+
   <div
     class="results"
     id="results"
   ></div>
 
+
 </div>
 
 
-<!-- Shared master coding data -->
+<!-- SHARED MASTER CODING LIBRARY -->
+
 <script src="coding-library.js"></script>
 
 
 <script>
 
-const USER_KEYWORD_STORE =
-  "expenseCodingKeywordsV1";
-
 
 /*
-  USER HUB RULE
+  USER VISIBILITY RULE
 
-  Only records marked:
+  USER
+  = visible to users + admins
 
-  User
-  Both
+  ADMIN
+  = admin only
 
-  will appear here.
-
-  Admin-only records stay hidden.
+  BOTH
+  = temporarily treated as User
+    while older records are migrated.
 */
 
 const userItems =
@@ -208,24 +317,10 @@ const userItems =
   );
 
 
-/*
-  Browser keyword data is included
-  for compatibility with the library.
-*/
-
-const savedKeywords =
-  JSON.parse(
-    localStorage.getItem(USER_KEYWORD_STORE) || "{}"
-  );
-
-
 function keywordsFor(item) {
 
   const defaults =
     defaultKeywords[item.Item] || [];
-
-  const saved =
-    savedKeywords[item.Item] || [];
 
   const itemKeywords =
     item.Keywords || [];
@@ -233,8 +328,7 @@ function keywordsFor(item) {
   return [
     ...new Set([
       ...defaults,
-      ...itemKeywords,
-      ...saved
+      ...itemKeywords
     ])
   ];
 
@@ -297,8 +391,8 @@ function renderResults() {
 
 
   /*
-    Keep the page blank until
-    the user actually searches.
+    Opening screen stays blank
+    until the user searches.
   */
 
   if (!search) {
@@ -333,6 +427,9 @@ function renderResults() {
 
         <div class="card">
 
+
+          <!-- ITEM BEING LOOKED UP -->
+
           <div class="card-title">
 
             <h3>
@@ -342,59 +439,70 @@ function renderResults() {
           </div>
 
 
-          <div class="details-grid">
+          <!-- CODING INFORMATION -->
 
-            <div class="full gl-account">
+          <div class="coding-details">
+
+
+            <div class="gl-account">
 
               <span class="label">
                 GL Account:
               </span>
 
-              ${item.GLNumber} - ${item.GLName}
+              <span class="value">
+                ${item.GLNumber} - ${item.GLName}
+              </span>
 
             </div>
 
 
-            <div>
-
-              <span class="label">
-                Department:
-              </span>
-
-              ${item.Department || ""}
-
-            </div>
+            <div class="details-grid">
 
 
-            <div>
+              <div class="detail-row">
 
-              <span class="label">
-                Class:
-              </span>
+                <span class="label">
+                  Department:
+                </span>
 
-              ${item.Class || ""}
+                ${item.Department || ""}
 
-            </div>
-
-
-            <div>
-
-              <span class="label">
-                Item:
-              </span>
-
-              ${item.ItemFlag || ""}
-
-            </div>
+              </div>
 
 
-            <div>
+              <div class="detail-row">
 
-              <span class="label">
-                Applicable Entities:
-              </span>
+                <span class="label">
+                  Class:
+                </span>
 
-              ${entitiesFor(item.Entity)}
+                ${item.Class || ""}
+
+              </div>
+
+
+              <div class="detail-row">
+
+                <span class="label">
+                  Item:
+                </span>
+
+                ${item.ItemFlag || ""}
+
+              </div>
+
+
+              <div class="detail-row">
+
+                <span class="label">
+                  Applicable Entities:
+                </span>
+
+                ${entitiesFor(item.Entity)}
+
+              </div>
+
 
             </div>
 
@@ -403,7 +511,7 @@ function renderResults() {
               item.Memo
               ? `
 
-                <div class="full memo">
+                <div class="memo">
 
                   <span class="label">
                     Memo:
@@ -417,20 +525,22 @@ function renderResults() {
               : ""
             }
 
+
+            ${
+              item.Note
+              ? `
+
+                <div class="note">
+                  ${item.Note}
+                </div>
+
+              `
+              : ""
+            }
+
+
           </div>
 
-
-          ${
-            item.Note
-            ? `
-
-              <div class="note">
-                ${item.Note}
-              </div>
-
-            `
-            : ""
-          }
 
         </div>
 
@@ -441,9 +551,22 @@ function renderResults() {
 }
 
 
+function referenceNotConnected(event) {
+
+  event.preventDefault();
+
+  alert(
+    "We will connect this button to the separate reference tool next."
+  );
+
+}
+
+
 renderResults();
 
+
 </script>
+
 
 </body>
 
