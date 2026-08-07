@@ -57,7 +57,6 @@ h1 {
 .reference-button {
   display: inline-flex;
   align-items: center;
-  gap: 7px;
   padding: 9px 14px;
   background: #ffffff;
   color: #0d3b66;
@@ -86,7 +85,7 @@ h1 {
   border: 1px solid #cbd5e1;
   border-radius: 8px;
   font-size: 15px;
-  background: white;
+  background: #ffffff;
 }
 
 .search-box input:focus {
@@ -110,19 +109,18 @@ h1 {
 .card {
   background: #ffffff;
   border-radius: 10px;
-  padding: 0;
-  overflow: hidden;
+  padding: 18px 22px;
   box-shadow: 0 2px 7px rgba(0,0,0,.06);
   border-left: 5px solid #0d3b66;
 }
 
 
-/* ITEM / SEARCH RESULT */
+/* ITEM NAME */
 
 .card-title {
-  padding: 15px 18px 13px;
-  background: #ffffff;
-  border-bottom: 1px solid #dfe5ec;
+  padding-bottom: 12px;
+  margin-bottom: 14px;
+  border-bottom: 1px solid #e2e8f0;
 }
 
 .card-title h3 {
@@ -133,69 +131,53 @@ h1 {
 }
 
 
-/* CODING AREA */
+/* CODING INFORMATION */
 
 .coding-details {
-  padding: 14px 18px 16px;
-  background: #fafbfd;
+  padding: 0;
 }
 
-.gl-account {
+.coding-line {
+  margin: 6px 0;
   font-size: 15px;
-  margin-bottom: 12px;
-}
-
-.gl-account .value {
-  font-weight: 700;
-  color: #1f2937;
-}
-
-.details-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 9px 28px;
-}
-
-.detail-row {
   line-height: 1.45;
-}
-
-.full {
-  grid-column: 1 / -1;
 }
 
 .label {
   font-weight: 700;
-  color: #374151;
+  color: #1f2937;
 }
 
 
 /* MEMO */
 
 .memo {
-  margin-top: 12px;
-  padding: 9px 11px;
-  background: #eef3f8;
-  border-radius: 6px;
+  margin-top: 16px;
+  padding-top: 12px;
+  border-top: 1px solid #e2e8f0;
+  font-size: 15px;
+  line-height: 1.45;
 }
 
 
-/* NOTE */
+/* NOTE / WARNING */
 
 .note {
-  margin-top: 12px;
+  margin-top: 14px;
   background: #fff3cd;
   border-left: 4px solid #f0ad4e;
   padding: 9px 11px;
   border-radius: 5px;
+  font-size: 14px;
   font-weight: 600;
+  line-height: 1.45;
 }
 
 
 /* NO RESULTS */
 
 .empty {
-  background: white;
+  background: #ffffff;
   padding: 22px;
   text-align: center;
   border-radius: 10px;
@@ -211,12 +193,8 @@ h1 {
     padding: 18px;
   }
 
-  .details-grid {
-    grid-template-columns: 1fr;
-  }
-
-  .full {
-    grid-column: auto;
+  .card {
+    padding: 16px 18px;
   }
 
 }
@@ -240,18 +218,13 @@ h1 {
 
   <div class="reference-links">
 
-    <!--
-      We will connect these to the actual separate
-      GitHub Pages URLs in the next step.
-    -->
-
     <a
       class="reference-button"
       id="codingReferenceLink"
       href="#"
       onclick="referenceNotConnected(event)"
     >
-      📘 Coding Reference
+      Coding Reference
     </a>
 
     <a
@@ -260,7 +233,7 @@ h1 {
       href="#"
       onclick="referenceNotConnected(event)"
     >
-      🏢 Entity Guide
+      Entity Guide
     </a>
 
   </div>
@@ -297,17 +270,13 @@ h1 {
 
 
 /*
-  USER VISIBILITY RULE
+  VISIBILITY RULE
 
-  USER
-  = visible to users + admins
+  User = visible on User Hub
+  Admin = hidden from User Hub
 
-  ADMIN
-  = admin only
-
-  BOTH
-  = temporarily treated as User
-    while older records are migrated.
+  Both is temporarily supported
+  for older library records.
 */
 
 const userItems =
@@ -316,6 +285,8 @@ const userItems =
     item.Visibility === "Both"
   );
 
+
+/* KEYWORDS */
 
 function keywordsFor(item) {
 
@@ -335,6 +306,8 @@ function keywordsFor(item) {
 }
 
 
+/* ENTITY DISPLAY */
+
 function entitiesFor(value) {
 
   if (!value) {
@@ -352,6 +325,8 @@ function entitiesFor(value) {
 
 }
 
+
+/* SEARCHABLE CONTENT */
 
 function searchableText(item) {
 
@@ -377,6 +352,8 @@ function searchableText(item) {
 }
 
 
+/* DISPLAY RESULTS */
+
 function renderResults() {
 
   const search =
@@ -391,8 +368,8 @@ function renderResults() {
 
 
   /*
-    Opening screen stays blank
-    until the user searches.
+    Keep opening screen blank
+    until something is searched.
   */
 
   if (!search) {
@@ -428,8 +405,6 @@ function renderResults() {
         <div class="card">
 
 
-          <!-- ITEM BEING LOOKED UP -->
-
           <div class="card-title">
 
             <h3>
@@ -439,70 +414,60 @@ function renderResults() {
           </div>
 
 
-          <!-- CODING INFORMATION -->
-
           <div class="coding-details">
 
 
-            <div class="gl-account">
+            <div class="coding-line">
 
               <span class="label">
-                GL Account:
+                Category/GL Code:
               </span>
 
-              <span class="value">
-                ${item.GLNumber} - ${item.GLName}
-              </span>
+              ${item.GLNumber} - ${item.GLName}
 
             </div>
 
 
-            <div class="details-grid">
+            <div class="coding-line">
+
+              <span class="label">
+                Department:
+              </span>
+
+              ${item.Department || ""}
+
+            </div>
 
 
-              <div class="detail-row">
+            <div class="coding-line">
 
-                <span class="label">
-                  Department:
-                </span>
+              <span class="label">
+                Class:
+              </span>
 
-                ${item.Department || ""}
+              ${item.Class || ""}
 
-              </div>
-
-
-              <div class="detail-row">
-
-                <span class="label">
-                  Class:
-                </span>
-
-                ${item.Class || ""}
-
-              </div>
+            </div>
 
 
-              <div class="detail-row">
+            <div class="coding-line">
 
-                <span class="label">
-                  Item:
-                </span>
+              <span class="label">
+                Item:
+              </span>
 
-                ${item.ItemFlag || ""}
+              ${item.ItemFlag || ""}
 
-              </div>
+            </div>
 
 
-              <div class="detail-row">
+            <div class="coding-line">
 
-                <span class="label">
-                  Applicable Entities:
-                </span>
+              <span class="label">
+                Applicable Entities:
+              </span>
 
-                ${entitiesFor(item.Entity)}
-
-              </div>
-
+              ${entitiesFor(item.Entity)}
 
             </div>
 
@@ -551,6 +516,8 @@ function renderResults() {
 }
 
 
+/* TEMPORARY REFERENCE BUTTON MESSAGE */
+
 function referenceNotConnected(event) {
 
   event.preventDefault();
@@ -562,11 +529,12 @@ function referenceNotConnected(event) {
 }
 
 
+/* INITIAL LOAD */
+
 renderResults();
 
 
 </script>
-
 
 </body>
 
