@@ -252,7 +252,7 @@ const codingLibrary = [
     "ItemFlag": "No",
     "Entity": "BTO",
     "Note": "If this is replacing an existing FF&E item, do NOT use this coding. Use Replacement Item Coding instead.",
-    "Visibility": "Admin",
+    "Visibility": "User",
     "Memo": "",
     "Keywords": [
       "shower head",
