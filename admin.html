@@ -1,0 +1,952 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Coding Admin Hub</title>
+
+<style>
+* {
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Segoe UI', Arial, sans-serif;
+  background: #f4f6f9;
+  margin: 0;
+  padding: 24px;
+  color: #1f2937;
+}
+
+.container {
+  max-width: 1100px;
+  margin: auto;
+}
+
+h1 {
+  text-align: center;
+  color: #0d3b66;
+  margin: 4px 0 6px;
+}
+
+.subtitle {
+  text-align: center;
+  color: #64748b;
+  margin: 0 0 22px;
+}
+
+.toolbar {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-bottom: 16px;
+}
+
+.btn {
+  border: 1px solid #cbd5e1;
+  background: #fff;
+  color: #0d3b66;
+  padding: 9px 13px;
+  border-radius: 8px;
+  font-weight: 700;
+  cursor: pointer;
+  text-decoration: none;
+}
+
+.btn:hover {
+  background: #eef3f8;
+}
+
+.primary {
+  background: #0d3b66;
+  color: white;
+  border-color: #0d3b66;
+}
+
+.primary:hover {
+  background: #092b4c;
+}
+
+.search {
+  width: 100%;
+  padding: 12px 14px;
+  border: 1px solid #cbd5e1;
+  border-radius: 8px;
+  font-size: 15px;
+  margin-bottom: 14px;
+}
+
+.card {
+  background: #fff;
+  border-radius: 10px;
+  padding: 15px 18px;
+  margin-bottom: 10px;
+  box-shadow: 0 2px 7px rgba(0,0,0,.06);
+  border-left: 5px solid #0d3b66;
+}
+
+.card-head {
+  display: flex;
+  justify-content: space-between;
+  gap: 15px;
+  align-items: flex-start;
+  padding-bottom: 11px;
+  margin-bottom: 11px;
+  border-bottom: 1px solid #e2e8f0;
+}
+
+.card h3 {
+  margin: 0;
+  color: #0d3b66;
+}
+
+.badge {
+  font-size: 12px;
+  font-weight: 800;
+  padding: 5px 9px;
+  border-radius: 999px;
+  background: #eef3f8;
+  color: #0d3b66;
+  white-space: nowrap;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 7px 22px;
+}
+
+.full {
+  grid-column: 1 / -1;
+}
+
+.label {
+  font-weight: 700;
+}
+
+.keywords {
+  font-size: 13px;
+  color: #475569;
+  margin-top: 10px;
+}
+
+.note {
+  background: #fff3cd;
+  border-left: 4px solid #f0ad4e;
+  padding: 9px 11px;
+  border-radius: 5px;
+  margin-top: 10px;
+}
+
+.modal-bg {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(15,23,42,.55);
+  z-index: 10;
+  padding: 24px;
+  overflow: auto;
+}
+
+.modal {
+  max-width: 760px;
+  margin: 3vh auto;
+  background: white;
+  border-radius: 14px;
+  padding: 22px;
+}
+
+.modal h2 {
+  color: #0d3b66;
+  margin-top: 0;
+}
+
+.form-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+.field label {
+  display: block;
+  font-weight: 700;
+  font-size: 13px;
+  margin-bottom: 5px;
+}
+
+.field input,
+.field select,
+.field textarea {
+  width: 100%;
+  padding: 10px;
+  border: 1px solid #cbd5e1;
+  border-radius: 7px;
+}
+
+.span-2 {
+  grid-column: 1 / -1;
+}
+
+.actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  margin-top: 18px;
+}
+
+.pills {
+  margin-top: 8px;
+}
+
+.pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  background: #eef3f8;
+  padding: 6px 9px;
+  border-radius: 999px;
+  margin: 3px;
+  font-size: 13px;
+}
+
+.pill button {
+  border: none;
+  background: none;
+  cursor: pointer;
+  font-size: 16px;
+}
+
+.empty {
+  text-align: center;
+  color: #64748b;
+  padding: 30px;
+}
+
+@media (max-width: 700px) {
+  .grid,
+  .form-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .full,
+  .span-2 {
+    grid-column: auto;
+  }
+
+  .card-head {
+    flex-direction: column;
+  }
+}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+  <h1>Coding Admin Hub</h1>
+  <p class="subtitle">
+    Maintain coding items, visibility, and keyword aliases.
+  </p>
+
+  <div class="toolbar">
+
+    <button class="btn primary" onclick="newItem()">
+      + Add Coding Item
+    </button>
+
+    <button class="btn" onclick="exportData()">
+      Export Master Data
+    </button>
+
+    <a class="btn" href="index.html" target="_blank">
+      Open User Hub
+    </a>
+
+  </div>
+
+  <input
+    class="search"
+    id="search"
+    type="text"
+    placeholder="Search item, keyword, GL account, department, or entity..."
+    oninput="render()"
+  >
+
+  <div id="results"></div>
+
+</div>
+
+
+<div
+  class="modal-bg"
+  id="modalBg"
+  onclick="if(event.target === this) closeModal()"
+>
+
+  <div class="modal">
+
+    <h2 id="modalTitle">Edit Coding Item</h2>
+
+    <div class="form-grid">
+
+      <div class="field span-2">
+        <label>Item / Coding Name</label>
+        <input id="fItem">
+      </div>
+
+      <div class="field">
+        <label>GL Account #</label>
+        <input id="fGLNumber">
+      </div>
+
+      <div class="field">
+        <label>GL Account Name</label>
+        <input id="fGLName">
+      </div>
+
+      <div class="field">
+        <label>Department</label>
+        <input id="fDepartment">
+      </div>
+
+      <div class="field">
+        <label>Class</label>
+        <input id="fClass">
+      </div>
+
+      <div class="field">
+        <label>Item</label>
+        <input id="fItemFlag">
+      </div>
+
+      <div class="field">
+        <label>Entity / Entity Group</label>
+        <input id="fEntity">
+      </div>
+
+      <div class="field">
+        <label>Visibility</label>
+
+        <select id="fVisibility">
+          <option>User</option>
+          <option>Admin</option>
+          <option>Both</option>
+        </select>
+      </div>
+
+      <div class="field span-2">
+        <label>Memo</label>
+        <input id="fMemo">
+      </div>
+
+      <div class="field span-2">
+        <label>Note</label>
+        <textarea id="fNote" rows="3"></textarea>
+      </div>
+
+      <div class="field span-2">
+
+        <label>Keywords</label>
+
+        <div style="display:flex; gap:8px;">
+
+          <input
+            id="newKeyword"
+            placeholder="Add keyword or alias..."
+          >
+
+          <button
+            type="button"
+            class="btn"
+            onclick="addKeyword()"
+          >
+            Add
+          </button>
+
+        </div>
+
+        <div id="keywordPills" class="pills"></div>
+
+      </div>
+
+    </div>
+
+    <div class="actions">
+
+      <button class="btn" onclick="closeModal()">
+        Cancel
+      </button>
+
+      <button class="btn primary" onclick="saveItem()">
+        Save
+      </button>
+
+    </div>
+
+  </div>
+
+</div>
+
+
+<script src="coding-library.js"></script>
+
+<script>
+
+const OVERRIDE_STORE = "codingAdminOverridesV1";
+const ADDED_STORE = "codingAdminAddedV1";
+
+let overrides =
+  JSON.parse(localStorage.getItem(OVERRIDE_STORE) || "{}");
+
+let added =
+  JSON.parse(localStorage.getItem(ADDED_STORE) || "[]");
+
+let editingKey = null;
+let workingKeywords = [];
+
+
+function keyFor(item) {
+  return item.Item + "|" + item.GLNumber + "|" + item.Entity;
+}
+
+
+function mergedItems() {
+
+  const originalItems = codingLibrary.map(item => {
+
+    const key = keyFor(item);
+
+    return {
+      ...item,
+      ...(overrides[key] || {})
+    };
+
+  });
+
+  return [
+    ...originalItems,
+    ...added
+  ];
+}
+
+
+function entitiesFor(value) {
+
+  if (!value) return "";
+
+  return (
+    entityExpansion[value] ||
+    [value]
+  ).join(", ");
+
+}
+
+
+function keywordsFor(item) {
+
+  const defaults =
+    defaultKeywords[item.Item] || [];
+
+  const saved =
+    item.Keywords || [];
+
+  return [
+    ...new Set([
+      ...defaults,
+      ...saved
+    ])
+  ];
+
+}
+
+
+function render() {
+
+  const query =
+    document
+      .getElementById("search")
+      .value
+      .trim()
+      .toLowerCase();
+
+  const results =
+    document.getElementById("results");
+
+
+  if (!query) {
+    results.innerHTML = "";
+    return;
+  }
+
+
+  const list = mergedItems().filter(item => {
+
+    const text = [
+      item.Item,
+      item.GLNumber,
+      item.GLName,
+      item.Department,
+      item.Class,
+      item.ItemFlag,
+      item.Entity,
+      item.Visibility,
+      ...keywordsFor(item)
+    ]
+    .filter(Boolean)
+    .join(" ")
+    .toLowerCase();
+
+    return text.includes(query);
+
+  });
+
+
+  if (!list.length) {
+
+    results.innerHTML =
+      '<div class="empty">No matches found.</div>';
+
+    return;
+  }
+
+
+  results.innerHTML = list.map(item => {
+
+    const keywords =
+      keywordsFor(item);
+
+    return `
+
+      <div class="card">
+
+        <div class="card-head">
+
+          <h3>${item.Item}</h3>
+
+          <span class="badge">
+            ${item.Visibility || "Both"}
+          </span>
+
+        </div>
+
+        <div class="grid">
+
+          <div class="full">
+            <span class="label">
+              GL Account:
+            </span>
+
+            ${item.GLNumber} - ${item.GLName}
+          </div>
+
+          <div>
+            <span class="label">
+              Department:
+            </span>
+
+            ${item.Department || ""}
+          </div>
+
+          <div>
+            <span class="label">
+              Class:
+            </span>
+
+            ${item.Class || ""}
+          </div>
+
+          <div>
+            <span class="label">
+              Item:
+            </span>
+
+            ${item.ItemFlag || ""}
+          </div>
+
+          <div>
+            <span class="label">
+              Applicable Entities:
+            </span>
+
+            ${entitiesFor(item.Entity)}
+          </div>
+
+          ${
+            item.Memo
+            ? `
+              <div class="full">
+                <span class="label">
+                  Memo:
+                </span>
+
+                ${item.Memo}
+              </div>
+            `
+            : ""
+          }
+
+        </div>
+
+        ${
+          keywords.length
+          ? `
+            <div class="keywords">
+
+              <strong>Keywords:</strong>
+
+              ${keywords.join(", ")}
+
+            </div>
+          `
+          : ""
+        }
+
+        ${
+          item.Note
+          ? `
+            <div class="note">
+              ${item.Note}
+            </div>
+          `
+          : ""
+        }
+
+        <div style="margin-top:12px;">
+
+          <button
+            class="btn"
+            onclick='editItem(${JSON.stringify(keyFor(item))})'
+          >
+            Edit
+          </button>
+
+        </div>
+
+      </div>
+
+    `;
+
+  }).join("");
+
+}
+
+
+function findByKey(key) {
+
+  return mergedItems().find(
+    item => keyFor(item) === key
+  );
+
+}
+
+
+function editItem(key) {
+
+  const item =
+    findByKey(key);
+
+  editingKey = key;
+
+  document
+    .getElementById("modalTitle")
+    .textContent =
+    "Edit Coding Item";
+
+  fillForm(item);
+
+  openModal();
+
+}
+
+
+function newItem() {
+
+  editingKey = null;
+
+  document
+    .getElementById("modalTitle")
+    .textContent =
+    "Add Coding Item";
+
+  fillForm({
+    Item: "",
+    GLNumber: "",
+    GLName: "",
+    Department: "",
+    Class: "",
+    ItemFlag: "",
+    Entity: "",
+    Visibility: "Both",
+    Memo: "",
+    Note: "",
+    Keywords: []
+  });
+
+  openModal();
+
+}
+
+
+function fillForm(item) {
+
+  const fields = [
+    "Item",
+    "GLNumber",
+    "GLName",
+    "Department",
+    "Class",
+    "ItemFlag",
+    "Entity",
+    "Visibility",
+    "Memo",
+    "Note"
+  ];
+
+  fields.forEach(name => {
+
+    document
+      .getElementById("f" + name)
+      .value =
+      item[name] || "";
+
+  });
+
+  workingKeywords =
+    [...keywordsFor(item)];
+
+  renderKeywordPills();
+
+}
+
+
+function renderKeywordPills() {
+
+  const container =
+    document.getElementById("keywordPills");
+
+  container.innerHTML =
+    workingKeywords.map(keyword => `
+
+      <span class="pill">
+
+        ${keyword}
+
+        <button
+          onclick='removeKeyword(${JSON.stringify(keyword)})'
+        >
+          &times;
+        </button>
+
+      </span>
+
+    `).join("");
+
+}
+
+
+function addKeyword() {
+
+  const input =
+    document.getElementById("newKeyword");
+
+  const keyword =
+    input.value.trim();
+
+  if (!keyword) return;
+
+  if (!workingKeywords.includes(keyword)) {
+    workingKeywords.push(keyword);
+  }
+
+  input.value = "";
+
+  renderKeywordPills();
+
+}
+
+
+function removeKeyword(keyword) {
+
+  workingKeywords =
+    workingKeywords.filter(
+      item => item !== keyword
+    );
+
+  renderKeywordPills();
+
+}
+
+
+function saveItem() {
+
+  const item = {};
+
+  const fields = [
+    "Item",
+    "GLNumber",
+    "GLName",
+    "Department",
+    "Class",
+    "ItemFlag",
+    "Entity",
+    "Visibility",
+    "Memo",
+    "Note"
+  ];
+
+  fields.forEach(name => {
+
+    item[name] =
+      document
+        .getElementById("f" + name)
+        .value
+        .trim();
+
+  });
+
+
+  item.Keywords =
+    [...workingKeywords];
+
+
+  if (
+    !item.Item ||
+    !item.GLNumber ||
+    !item.GLName
+  ) {
+
+    alert(
+      "Item, GL Account #, and GL Account Name are required."
+    );
+
+    return;
+
+  }
+
+
+  if (editingKey) {
+
+    const original =
+      codingLibrary.find(
+        item => keyFor(item) === editingKey
+      );
+
+
+    if (original) {
+
+      overrides[editingKey] = item;
+
+      localStorage.setItem(
+        OVERRIDE_STORE,
+        JSON.stringify(overrides)
+      );
+
+    }
+
+    else {
+
+      const index =
+        added.findIndex(
+          item => keyFor(item) === editingKey
+        );
+
+      if (index >= 0) {
+        added[index] = item;
+      }
+
+      localStorage.setItem(
+        ADDED_STORE,
+        JSON.stringify(added)
+      );
+
+    }
+
+  }
+
+  else {
+
+    added.push(item);
+
+    localStorage.setItem(
+      ADDED_STORE,
+      JSON.stringify(added)
+    );
+
+  }
+
+
+  closeModal();
+
+  render();
+
+}
+
+
+function exportData() {
+
+  const data =
+    mergedItems();
+
+  const blob =
+    new Blob(
+      [JSON.stringify(data, null, 2)],
+      { type: "application/json" }
+    );
+
+  const link =
+    document.createElement("a");
+
+  link.href =
+    URL.createObjectURL(blob);
+
+  link.download =
+    "coding-library-master.json";
+
+  link.click();
+
+  setTimeout(() => {
+    URL.revokeObjectURL(link.href);
+  }, 500);
+
+}
+
+
+function openModal() {
+
+  document
+    .getElementById("modalBg")
+    .style.display =
+    "block";
+
+}
+
+
+function closeModal() {
+
+  document
+    .getElementById("modalBg")
+    .style.display =
+    "none";
+
+}
+
+
+document.addEventListener(
+  "keydown",
+  function(event) {
+
+    if (event.key === "Escape") {
+      closeModal();
+    }
+
+  }
+);
+
+
+render();
+
+</script>
+
+</body>
+</html>
