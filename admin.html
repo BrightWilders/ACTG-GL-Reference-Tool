@@ -255,9 +255,13 @@ h1 {
       + Add Coding Item
     </button>
 
-    <button class="btn" onclick="exportData()">
-      Export Master Data
-    </button>
+  <button class="btn" onclick="copyMasterLibrary()">
+  Copy Master Library
+</button>
+
+<button class="btn" onclick="downloadExcel()">
+  Download Excel
+</button>
 
     <a class="btn" href="index.html" target="_blank">
       Open User Hub
@@ -883,25 +887,65 @@ function saveItem() {
 }
 
 
-function exportData() {
+function copyMasterLibrary() {
 
-  const data =
-    mergedItems();
+  const data = mergedItems();
 
-  const blob =
-    new Blob(
-      [JSON.stringify(data, null, 2)],
-      { type: "application/json" }
-    );
+  const libraryText =
+`const codingLibrary = ${JSON.stringify(data, null, 2)};
 
-  const link =
-    document.createElement("a");
+const defaultKeywords = ${JSON.stringify(defaultKeywords, null, 2)};
 
-  link.href =
-    URL.createObjectURL(blob);
+const entityExpansion = ${JSON.stringify(entityExpansion, null, 2)};`;
 
-  link.download =
-    "coding-library-master.json";
+  navigator.clipboard.writeText(libraryText)
+    .then(() => {
+      alert("Master library copied to clipboard.");
+    })
+    .catch(() => {
+      alert("Unable to copy the master library.");
+    });
+
+}
+
+
+function downloadExcel() {
+
+  const data = mergedItems();
+
+  const rows = data.map(item => ({
+    "Item / Coding Name": item.Item || "",
+    "GL Account": `${item.GLNumber || ""} - ${item.GLName || ""}`,
+    "Department": item.Department || "",
+    "Class": item.Class || "",
+    "Item": item.ItemFlag || "",
+    "Entity / Entity Group": item.Entity || "",
+    "Visibility": item.Visibility || "",
+    "Memo": item.Memo || "",
+    "Note": item.Note || "",
+    "Keywords": keywordsFor(item).join(", ")
+  }));
+
+  const headers = Object.keys(rows[0] || {});
+
+  const csv = [
+    headers.join(","),
+    ...rows.map(row =>
+      headers.map(header => {
+        const value = String(row[header] ?? "");
+        return `"${value.replace(/"/g, '""')}"`;
+      }).join(",")
+    )
+  ].join("\n");
+
+  const blob = new Blob([csv], {
+    type: "text/csv;charset=utf-8;"
+  });
+
+  const link = document.createElement("a");
+
+  link.href = URL.createObjectURL(blob);
+  link.download = "expense-coding-master.csv";
 
   link.click();
 
@@ -910,7 +954,6 @@ function exportData() {
   }, 500);
 
 }
-
 
 function openModal() {
 
